@@ -24,16 +24,6 @@ function Site() {
     this.route = function(path){
         document.querySelector('app-router').go(path);
     }
-    this.userAuthed = function(){
-        // this is not totally secure, but it's impossible to make authenitcated
-        // requests without a valid session token
-        if ($.cookie('session') == undefined){
-            return false;
-        }
-        else {
-            return true;
-        }
-    }
     this.notify = function(title, text, buttons){
         $('#notification').empty();
         var buttonDiv = $('<div/>')
@@ -61,82 +51,6 @@ function Site() {
     }
     this.notify_toggle = function(){
         $('#notification')[0].toggle();
-    }
-    this.navbar_mode = function(mode){
-        $('#nav-mobile').empty();
-        if (mode == "unauthed"){
-            $('#nav-mobile').append(
-                $('<li/>')
-                    .attr('id', 'register-button')
-                    .text("Register")
-                    .click(
-                        function() {
-                            site.route('/register');
-                        }
-                    )
-            );
-            var w = $('#register-button').width() + 21;
-            $('#register-button').css({"width": w});
-            $('#nav-mobile').append(
-                $('<li/>')
-                    .attr('id', 'login-button')
-                    .text("Login")
-                    .click(
-                        function() {
-                            site.route('/login');
-                        }
-                    )
-            );
-            var w = $('#login-button').width() + 21;
-            $('#login-button').css({"width": w});
-        }
-        else if (mode = 'authed') {
-            // add welcome message
-            $('#nav-mobile').append(
-                $('<li/>')
-                    .attr('id', 'user-div')
-                    .text(
-                        "Hello, " + $.cookie('userName')
-                    )
-            );
-            // fix padding (Because we don't know how long the username is)
-            var w = $('#user-div').width() + 21;
-            $('#user-div').css({"width": w});
-            // on mouse over, show logout button
-            $('#user-div')
-              .mouseover(function(){
-                $('#user-div')
-                  .text("Logout")
-                  .click(function(){
-                    $.removeCookie('session');
-                    $.removeCookie('userID');
-                    $.removeCookie('userName');
-                    $('#user-div').empty();
-                    $('#user-div').off();
-                    site.route('/');
-                  })
-                ;
-              })
-              .mouseout(function(){
-                $('#user-div')
-                  .text("Hello, " + $.cookie('userName'))
-                  .off('click')
-                ;
-              })
-            ;
-            // Show 'my account' button
-            $('#nav-mobile').append(
-                $('<li/>')
-                    .attr('id', 'my-account')
-                    .text(
-                        "My Account"
-                    )
-                    .css('padding-right', '15px')
-                    .click(function(){
-                        site.route('/my-account');
-                    })
-            );
-        }
     }
 }
 var site = new Site()

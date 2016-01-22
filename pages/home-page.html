@@ -21,73 +21,11 @@
                 </ul>
             </div>
             <div id="headContent">
-Welcome to TaiiCMS
-==================
-
-TaiiCMS is a content management system written for `mod_python`
-and `mongodb`. It provides a simple way to manage and develop
-a webpage. TaiiCMS attempts to provide the basic features required
-by most projects in a non-intrusive way.
-
-TaiiCMS is broken up into two parts: authentication, and pagination.
-
-Authentication
---------------
-
-The authentication services included within TaiiCMS provide a simple
-JSON API to the front end, allowing each page to execute database
-functions as simply as possible. By using this method of authentication,
-it is possible to completely redesign your site, while still allowing
-the front end to authenticate and perform actions on the user. The design
-that comes with TaiiCMS is simply a material design base.
-
-Pagination
-----------
-
-This is where TaiiCMS becomes non-standard. Traditional CMSs save
-content inside a database, allowing it to be retrieved using
-templating systems. TaiiCMS stores none of your content in databases
-and instead stores it in traditional HTML files. The distiction
-between the method used by TaiiCMS and the traditional method of
-storing content inside individual files is that TaiiCMS stores
-it's content within webcomponent-compatible elements known as
-Polymer Elements.
-
-The Polymer framework allows developers to import Polymer Elements
-in the form of HTML files, and place them on the page. TaiiCMS
-uses a combination of Polymer Elements to load pages from the
-`/pages` directory, and switches between them using JavaScript.
-
-How to Use TaiiCMS
-------------------
-
-### Configuration
-While TaiiCMS is widely configurable in that it is open to modification,
-any configuration options provided by the default installation can be
-found in `index.html`, for front-end configuration; and `api.py`, for
-configuration of the back-end.
-
-### Creating or Editing a Page
-In order to edit or create a page, one must do so within the `/pages`
-directory. Here you must construct a valid polymer element that will
-be displayed in the main content section of the page.
-
-If you are creating a new page, you will need to import and include it
-within `index.html`. You must add an `<import>` tag in the head of the
-document, and an element within the `<app-router>` section of `index.html`.
-Then you will be able to use `site.router('/desination')` to navigate to
-your new page, or simply navigate to `#/desitnation` in the URI.
-
-### The API
-The JavaScript library `js/site.js` creates the `site` object. `site`
-controls many of the features of TaiiCMS, and it is reccomended that it
-is kept, as long as you are still using TaiiCMS's pagination.
-
-The JavaScript library `js/api.js` creates the `api` object. `api`
-contains all of the wrapping for TaiiCMS's Python API.
-
+### Looking for Elo?
+Simply enter the usernames of you and your current team(If any), then enter the credentials desired for your team.
+Once your team has been assembled, you will be placed into a Google+ Hangout. Have fun!
             </div>
-            <div id="projects"></div>
+            <ul id="team" class="collection"></ul>
         </div>
     </template>
 </dom-module>
@@ -97,23 +35,78 @@ contains all of the wrapping for TaiiCMS's Python API.
         attached: function() {
             // markup the markdown
             site.markdown('#headContent');
-            
-            // check if we have a session cookie
-            if ($.cookie('session') == undefined){
-                // user is not logged in, send them to login
-                //site.route('/login');
-                var userAuthed = false;
+
+            // creates the markup for a single player
+            function player(i){
+                return $('<li/>')
+                    .addClass("collection-item")
+                    .append($('<div/>')
+                        .addClass('row')
+                        .append($('<i/>')
+                            .addClass('material-icons col s1')
+                            .text("face")
+                        )
+                        .append($('<div/>')
+                            .addClass("input-field col s3")
+                            .append($("<input/>")
+                                .attr("id", "username" + i)
+                                .attr("type", "text")
+                                .addClass("validate")
+                            )
+                            .append($('<label/>')
+                                .addClass("active")
+                                .attr("for", "username" + i)
+                                .text("Username")
+                            )
+                        )
+                        .append($('<div/>')
+                            .addClass("col s6")
+                            .append(dropdown(i, "role", "Role ▼", [
+                                "Top", "Jungle",
+                                "Mid",
+                                "ADC", "Support"
+                            ]))
+                        )
+                    )
+                ;
             }
-            else {
-                var userAuthed = true;
+            // returns the markup for a dropdown menu
+            function dropdown(i, id, text, values){
+                var dropdown = $('<a/>')
+                    .addClass("dropdown-button btn")
+                    .attr("data-activates", id + i)
+                    .text(text) // Role ▼
+
+                var options = $('<ul/>')
+                    .attr('id', "roles" + i)
+                    .addClass("dropdown-content")
+
+                for (var index in values){
+                    var value = values[index];
+                    options.append($('<li/>')
+                        .append($('<span/>')
+                            .attr("value", index)
+                            .text(value)
+                        )
+                    )
+                }
+                return [dropdown, options];
             }
-            if (userAuthed){
-                // if user is authed, show their name and logout button
-                site.navbar_mode('authed');
+            for (var i = 0; i < 5; i++){
+                $('#team').append(player(i));
             }
-            else {
-                site.navbar_mode('unauthed');
-            }
+            $('.dropdown-button').dropdown({});
+            $('.dropdown-content > li').click( function(){
+                // holy javascript, batman
+                $(this).parent().parent().children('a').text($(this).children("span").text());
+            });
+
+            $('#textboxId').keydown(function (event) {
+                var keypressed = event.keyCode || event.which;
+                if (keypressed == 13) {
+                    $(this).closest('form').submit();
+                }
+            });
         }
     });
 </script>
