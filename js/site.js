@@ -1,9 +1,7 @@
 function Site() {
     // Send a toast notification.
     this.toast = function(message){
-        var toast = $('#toast')[0];
-        toast.text = message;
-        toast.show();
+        Materialize.toast(message, 4000);
     }
     // Make a call to the api.
     this.api = function(action, data, callback){
