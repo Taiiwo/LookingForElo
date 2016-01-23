@@ -1,112 +1,269 @@
 <link rel="import" href="../components/eric/eric-projects.html">
 <dom-module id="home-page">
-    <template>
-        <style>
-            #add {
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-            }
-        </style>
-        <div class="container">
-            <div class="fixed-action-btn">
-                <a class="btn-floating btn-large red waves-effect waves-light">
-                    <i class="large material-icons">mode_edit</i>
-                </a>
-                <ul>
-                    <li><a class="btn-floating red waves-effect waves-light"><i class="material-icons">insert_chart</i></a></li>
-                    <li><a class="btn-floating yellow darken-1 waves-effect waves-light"><i class="material-icons">format_quote</i></a></li>
-                    <li><a class="btn-floating green waves-effect waves-light"><i class="material-icons">publish</i></a></li>
-                    <li><a class="btn-floating blue waves-effect waves-light"><i class="material-icons">attach_file</i></a></li>
-                </ul>
-            </div>
-            <div id="headContent">
+  <template>
+    <style>
+      #add {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+      }
+      .dropdown {
+        position: relative;
+        top: 15px;
+      }
+      .mic {
+        position: relative;
+        top: 30px;
+      }
+      .summoner-icon-img {
+        width: 100%;
+      }
+      .row.summoner {
+        margin-bottom: 0px;
+      }
+    </style>
+    <div class="container">
+      <div class="fixed-action-btn">
+        <a class="btn-floating btn-large green waves-effect waves-light" id="send">
+          <i class="large material-icons">send</i>
+        </a>
+      </div>
+      <div id="headContent">
 ### Looking for Elo?
 Simply enter the usernames of you and your current team(If any), then enter the credentials desired for your team.
 Once your team has been assembled, you will be placed into a Google+ Hangout. Have fun!
-            </div>
-            <ul id="team" class="collection"></ul>
-        </div>
-    </template>
+      </div>
+      <ul id="team" class="collection"></ul>
+    </div>
+  </template>
 </dom-module>
 <script>
-    Polymer({
-        is: "home-page",
-        attached: function() {
-            // markup the markdown
-            site.markdown('#headContent');
+  Polymer({
+    is: "home-page",
+    attached: function() {
+      // markup the markdown
+      site.markdown('#headContent');
 
-            // creates the markup for a single player
-            function player(i){
-                return $('<li/>')
-                    .addClass("collection-item")
-                    .append($('<div/>')
-                        .addClass('row')
-                        .append($('<i/>')
-                            .addClass('material-icons col s1')
-                            .text("face")
-                        )
-                        .append($('<div/>')
-                            .addClass("input-field col s3")
-                            .append($("<input/>")
-                                .attr("id", "username" + i)
-                                .attr("type", "text")
-                                .addClass("validate")
-                            )
-                            .append($('<label/>')
-                                .addClass("active")
-                                .attr("for", "username" + i)
-                                .text("Username")
-                            )
-                        )
-                        .append($('<div/>')
-                            .addClass("col s6")
-                            .append(dropdown(i, "role", "Role ▼", [
-                                "Top", "Jungle",
-                                "Mid",
-                                "ADC", "Support"
-                            ]))
-                        )
-                    )
-                ;
-            }
-            // returns the markup for a dropdown menu
-            function dropdown(i, id, text, values){
-                var dropdown = $('<a/>')
-                    .addClass("dropdown-button btn")
-                    .attr("data-activates", id + i)
-                    .text(text) // Role ▼
+      // creates the markup for a single player
+      function player(i){
+        return $('<li/>')
+          .addClass("collection-item")
+          .append($('<div/>')
+            .addClass('row summoner home-page')
+            .append($('<div/>')
+              .attr("id", "summoner-icon" + i)
+              .addClass(" col s1 summoner-icon")
+              .append($('<i/>')
+                .addClass("material-icons large")
+                .text("face")
+              )
+            )
+            .append($('<div/>')
+              .addClass("input-field col s3 username")
+              .append($("<input/>")
+                .attr("id", "username" + i)
+                .attr("type", "text")
+                .addClass("validate")
+              )
+              .append($('<label/>')
+                .attr("for", "username" + i)
+                .text("Username (Optional)")
+              )
+            )
+            .append($('<div/>')
+              .addClass("col s2 offset-s3 dropdown home-page role")
+              .append(dropdown(i, "role", "Role", "Select a Role", [
+                "Top", "Jungle",
+                "Mid",
+                "ADC", "Support"
+              ]))
+            )
+            .append($('<div/>')
+              .addClass("col s2 dropdown home-page rank")
+              .append(dropdown(i, "rank", "Rank", "Select a Rank", [
+                "Under Level 30", "Unranked",
+                "Bronze", "Silver", "Gold",
+                "Platinum", "Diamond", "Challenger"
+              ]))
+            )
+            .append($('<div/>')
+              .addClass("col s1 mic home-page")
+              .append($('<input/>')
+                .attr('type', "checkbox")
+                .attr("id", "mic" + i)
+                .addClass("filled-in")
+              )
+              .append($('<label/>')
+                .attr("for", "mic" + i)
+                .append($('<i/>')
+                  .addClass("material-icons")
+                  .text("mic")
+                )
+              )
+            )
+          )
+        ;
+      }
+      // returns the markup for a dropdown menu
+      function dropdown(i, id, text, init, values){
+        var options = $('<select/>')
+          .attr('id', id + i)
+          .attr('multiple', 'true')
+          .attr('value', '')
+          .append($('<option/>')
+            .attr('value', '')
+            .attr('disabled', 'true')
+            .text(init)
+          )
+        ;
 
-                var options = $('<ul/>')
-                    .attr('id', "roles" + i)
-                    .addClass("dropdown-content")
-
-                for (var index in values){
-                    var value = values[index];
-                    options.append($('<li/>')
-                        .append($('<span/>')
-                            .attr("value", index)
-                            .text(value)
-                        )
-                    )
-                }
-                return [dropdown, options];
-            }
-            for (var i = 0; i < 5; i++){
-                $('#team').append(player(i));
-            }
-            $('.dropdown-button').dropdown({});
-            $('.dropdown-content > li').click( function(){
-                // holy javascript, batman
-                $(this).parent().parent().children('a').text($(this).children("span").text());
-            });
-
-            $('#textboxId').keydown(function (event) {
-                var keypressed = event.keyCode || event.which;
-                if (keypressed == 13) {
-                    $(this).closest('form').submit();
-                }
-            });
+        for (var index in values){
+          var value = values[index];
+          options.append($('<option/>')
+            .attr("value", index)
+            .text(value)
+          );
         }
-    });
+        var label = $('<label/>')
+          .text(text)
+          .attr('for', id + i)
+        return [options, label];
+      }
+      for (var i = 0; i < 5; i++){
+        $('#team').append(player(i));
+      }
+      $('select').material_select();
+      $('option').click( function(){
+        // holy javascript, batman
+        $(this).parent().parent().children('a').text($(this).children("span").text());
+      });
+
+      $('.username').keydown(function (event) {
+        var keypressed = event.keyCode || event.which;
+        if (keypressed == 13) {
+          var region = "euw";
+          var baseurl = "https://"+region+".api.pvp.net/api/lol/"+region+"/v1.4/";
+          var baseurl2 = "https://"+region+".api.pvp.net/api/lol/"+region+"/v2.5/";
+          var key = "d28d278f-a1d9-491c-9c1b-e762925f4a71";
+          var username = $(this).children('input').val();
+          var that = this;
+          var userFound = false;
+          var summoner;
+          $.get(
+            baseurl + "summoner/by-name/"+username+"?api_key=" + key,
+            function(data){
+              summoner = data[
+                username.toLowerCase().replace(new RegExp(" ", "g"),'')
+              ];
+              // set summoner icon
+              var summoner_icon = $(that).parent().children('.summoner-icon');
+              summoner_icon.empty();
+              summoner_icon.append($('<img/>')
+                .attr("src",
+                  "http://ddragon.leagueoflegends.com/cdn/6.1.1/img/profileicon/" +
+                  summoner.profileIconId + ".png"
+                )
+                .addClass("home-page summoner-icon-img")
+              );
+              var rank_dropdown = $(that)
+                .parent().children('.rank')
+                .children('.select-wrapper')
+                .children('input')
+              ;
+              if (summoner.summonerLevel < 30){
+                userFound = true;
+                rank_dropdown.val("Under Level 30");
+                rank_dropdown.attr("disabled", "");
+              }
+              else {
+                // the summoner is not level 30
+                $.ajax({
+                  type: "GET",
+                  url: baseurl2 + "league/by-summoner/"+summoner.id+"/entry?api_key=" + key,
+                  success: function (data){
+                    userFound = true;
+                    var tier = data[summoner.id][0].tier
+                    tier = tier[0].toUpperCase() + tier.substr(1).toLowerCase();
+                    rank_dropdown.val(tier);
+                    rank_dropdown.attr("disabled", "");
+                  },
+                  error: function (data){
+                    //error
+                    if (data.status == 404){
+                      userFound = true;
+                      rank_dropdown.val("Unranked");
+                      rank_dropdown.attr("disabled", "");
+                    }
+                  }
+                });
+              }
+            }
+          );
+          if (userFound){
+            $(that).parent().attr("found", "true");
+            $(that).parent().attr("id", summoner.id);
+          }
+        }
+      });
+      $('#send').click(function() {
+        // validate the form
+        var team = [];
+        var desired_team = [];
+        // iterate the members
+        $('#team > .collection-item').each(function(index){
+          member_element = $(this).children();
+          member = {};
+          var roles_tmp = member_element
+            .children('.role').children('.select-wrapper')
+            .children('input.select-dropdown').val()
+          member.roles = [
+            ((roles_tmp.search('Top') > -1) ? true : false),
+            ((roles_tmp.search('Jungle') > -1) ? true : false),
+            ((roles_tmp.search('Mid') > -1) ? true : false),
+            ((roles_tmp.search('ADC') > -1) ? true : false),
+            ((roles_tmp.search('Support') > -1) ? true : false),
+          ];
+          if (member_element.attr('found')){
+            member.id = member_element.attr('id');
+            member.username = member_element
+              .children('.username').children('input').val()
+            ;
+            member.ranks = member_element
+              .children('.rank').children('select-wrapper')
+              .children('input.select-dropdown').val()
+            ;
+            team.push(member);
+          }
+          else {
+            member.ranks = [
+              ((roles_tmp.search('Under Level 30') > -1) ? true : false),
+              ((roles_tmp.search('Unranked') > -1) ? true : false),
+              ((roles_tmp.search('Bronze') > -1) ? true : false),
+              ((roles_tmp.search('Silver') > -1) ? true : false),
+              ((roles_tmp.search('Gold') > -1) ? true : false),
+              ((roles_tmp.search('Platinum') > -1) ? true : false),
+              ((roles_tmp.search('Diamond') > -1) ? true : false),
+              ((roles_tmp.search('Challenger') > -1) ? true : false)
+            ];
+            desired_team.push(member);
+          }
+        });
+        console.log(team, desired_team);
+        // check if there is a group waiting
+        /*
+        $.post(
+          "http://phantas.ml/real-time-mongo/api/",
+          {
+            team: JSON.stringify({
+              team:
+              desired_team:
+            })
+          }
+        )
+        // if not, wait for a group
+        var rtm = RTM("http://phantas.ml:12345");
+        */
+      });
+    }
+  });
 </script>
